@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function Header({ onLogout }) {
+export default function Header({ email, onLogout }) {
   return (
     <header className="header">
       <div className="header-inner">
@@ -10,6 +10,9 @@ export default function Header({ onLogout }) {
         </div>
         <button className="logout-btn" onClick={onLogout}>Logout</button>
       </div>
+      {email && (
+        <div style={{ padding: '0 16px 8px', fontSize: '0.72rem', color: '#8e8e93' }}>{email}</div>
+      )}
     </header>
   )
 }

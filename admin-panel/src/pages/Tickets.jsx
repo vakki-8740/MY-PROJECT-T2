@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
-
-const API = `${import.meta.env.VITE_API_URL || ''}/admin.php`
+import { subscribeTickets, updateTicketStatus, deleteTicket } from '../lib/db.js'
 
 const statusColors = { open: '#ff9500', processing: '#007aff', resolved: '#34c759', rejected: '#ff3b30' }
 
@@ -11,23 +9,16 @@ export default function Tickets() {
   const [error, setError] = useState('')
   const [showAlert, setShowAlert] = useState(false)
 
-  const load = () => {
-    setLoading(true)
-    fetch(`${API}?action=tickets_list`)
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.error) {
-          const err = data.error
-          setError(typeof err === 'object' && err ? (err.message || 'Server error') : err)
-          setTickets([])
-        }
-        else { setTickets(data.tickets || []) }
-      })
-      .catch(() => { setError('Server error'); setTickets([]) })
-      .finally(() => setLoading(false))
-  }
-
-  useEffect(() => { load() }, [])
+  useEffect(() => {
+    const unsub = subscribeTickets((list) => {
+      setTickets(list)
+      setLoading(false)
+    }, (err) => {
+      setError(err?.message || 'Could not load tickets')
+      setLoading(false)
+    })
+    return () => unsub()
+  }, [])
 
   const copy = (text) => {
     navigator.clipboard?.writeText(text)
@@ -36,17 +27,12 @@ export default function Tickets() {
   }
 
   const changeStatus = (id, status) => {
-    fetch(`${API}?action=ticket_status`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id, status }),
-    }).then(load).catch(() => {})
+    updateTicketStatus(id, status).catch(() => {})
   }
 
   const remove = (id) => {
     if (!window.confirm('Delete this ticket permanently?')) return
-    fetch(`${API}?action=ticket_delete&id=${id}`, { method: 'GET' })
-      .then(load).catch(() => {})
+    deleteTicket(id).catch(() => {})
   }
 
   return (
@@ -60,12 +46,12 @@ export default function Tickets() {
         {tickets.map((t) => (
           <div key={t.id} className="ticket-card">
             <div className="ticket-header">
-              <span className="ticket-id">#{t.id}</span>
+              <span className="ticket-id">#{t.id.slice(-6)}</span>
               <span className="ticket-type" style={{ background: t.type === 'deposit' ? '#eaf3ff' : t.type === 'withdrawal' ? '#e8f9ed' : '#f1ecff', color: t.type === 'deposit' ? '#007aff' : t.type === 'withdrawal' ? '#34c759' : '#5856d6' }}>
                 {t.type === 'deposit' ? 'Deposit' : t.type === 'withdrawal' ? 'Withdrawal' : 'Email'}
               </span>
               <select
-                value={t.status}
+                value={t.status || 'open'}
                 onChange={(e) => changeStatus(t.id, e.target.value)}
                 className="status-select"
                 style={{ color: statusColors[t.status] || '#8e8e93', borderColor: statusColors[t.status] || '#ececee' }}
@@ -83,12 +69,8 @@ export default function Tickets() {
               <DetailRow label="Game Password" value={t.game_password} onCopy={() => copy(t.game_password)} sensitive />
               {t.problem && <p className="ticket-detail"><strong>Problem:</strong> {t.problem}</p>}
               {t.amount && <p className="ticket-detail"><strong>Amount:</strong> {t.amount}</p>}
-              <p className="ticket-detail"><strong>Submitted:</strong> {t.created_at}</p>
-              {t.image && (
-                <a href={`${import.meta.env.VITE_API_URL || ''}/uploads/${t.image}`} target="_blank" rel="noreferrer" className="ticket-img-link">
-                  View Image &#8599;
-                </a>
-              )}
+              {t.image_name && <p className="ticket-detail"><strong>Image:</strong> {t.image_name}</p>}
+              <p className="ticket-detail"><strong>Submitted:</strong> {t.created_at ? new Date(t.created_at).toLocaleString() : '-'}</p>
             </div>
             <div className="ticket-footer">
               <button className="btn btn-sm danger" onClick={() => remove(t.id)}>Delete</button>

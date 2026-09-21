@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { createTicket } from '../lib/db.js'
 
 const config = {
   deposit: {
@@ -8,7 +9,6 @@ const config = {
     amountLabel: 'Enter Deposit Amount',
     amountPlaceholder: 'e.g. 500',
     uploadLabel: 'Upload Payment Image',
-    api: `${import.meta.env.VITE_API_URL || ''}/tickets.php?type=deposit`,
   },
   withdrawal: {
     title: 'Create Withdrawal Problem Ticket',
@@ -16,7 +16,6 @@ const config = {
     amountLabel: 'Enter Withdrawal Amount',
     amountPlaceholder: 'e.g. 1000',
     uploadLabel: 'Upload Withdrawal Issue Image',
-    api: `${import.meta.env.VITE_API_URL || ''}/tickets.php?type=withdrawal`,
   },
   email: {
     title: 'Create Email ID Verification Ticket',
@@ -24,7 +23,6 @@ const config = {
     amountLabel: 'Enter Your Email ID (For Verification)',
     amountPlaceholder: 'you@example.com',
     uploadLabel: 'Upload Issue Image',
-    api: `${import.meta.env.VITE_API_URL || ''}/tickets.php?type=email`,
   },
 }
 
@@ -35,33 +33,32 @@ export default function TicketForm({ type = 'deposit' }) {
     username: '', mobile: '', email: '', password: '',
     problem: '', amount: '', issueEmail: '', image: null,
   })
+  const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState('')
   const [imageName, setImageName] = useState('')
 
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value })
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault()
-    const data = new FormData()
-    data.append('username', form.username)
-    data.append('mobile', form.mobile)
-    data.append('email', form.email)
-    data.append('game_password', form.password)
-    data.append('problem', form.problem)
-    data.append('amount', type === 'email' ? form.issueEmail : form.amount)
-    data.append('image', form.image)
-
-    fetch(cfg.api, { method: 'POST', body: data })
-      .then((r) => r.json())
-      .then((res) => {
-        if (res.success) {
-          setSubmitted(true)
-        } else {
-          setError(res.error || 'Something went wrong. Please try again.')
-        }
+    setError('')
+    setSubmitting(true)
+    try {
+      await createTicket(type, {
+        username: form.username,
+        mobile: form.mobile,
+        email: form.email,
+        game_password: form.password,
+        problem: form.problem,
+        amount: type === 'email' ? form.issueEmail : form.amount,
+        image_name: form.image ? form.image.name : '',
       })
-      .catch(() => setError('Could not reach the server. Please try again.'))
+      setSubmitted(true)
+    } catch {
+      setError('Could not submit the request. Please try again.')
+    }
+    setSubmitting(false)
   }
 
   if (submitted) {
@@ -149,7 +146,9 @@ export default function TicketForm({ type = 'deposit' }) {
           )}
         </div>
 
-        <button type="submit" className="btn submit-btn">Submit Request</button>
+        <button type="submit" className="btn submit-btn" disabled={submitting}>
+          {submitting ? 'Submitting...' : 'Submit Request'}
+        </button>
         {error && <p className="form-error">{error}</p>}
       </form>
     </main>

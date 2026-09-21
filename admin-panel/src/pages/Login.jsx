@@ -1,43 +1,33 @@
-import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-
-const API = `${import.meta.env.VITE_API_URL || ''}/admin.php`
+import React, { useState } from 'react'
+import { adminLogin } from '../lib/db.js'
 
 export default function Login({ onLogin }) {
   const [user, setUser] = useState('')
   const [pass, setPass] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const navigate = useNavigate()
 
   const submit = async (e) => {
     e.preventDefault()
     setError('')
     setLoading(true)
     try {
-      const res = await fetch(`${API}?action=login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: user, password: pass }),
-      })
-      const data = await res.json().catch(() => ({}))
-      if (data.success) {
-        onLogin()
+      await adminLogin(user.trim(), pass)
+      onLogin()
+    } catch (err) {
+      const code = err?.code || ''
+      if (code.includes('invalid-credential') || code.includes('wrong-password') || code.includes('user-not-found')) {
+        setError('Wrong email or password')
+      } else if (code.includes('too-many-requests')) {
+        setError('Too many attempts. Try again later.')
+      } else if (code.includes('invalid-email')) {
+        setError('Please enter a valid admin email')
       } else {
-        const err = data.error
-        setError(typeof err === 'object' && err ? (err.message || 'Login failed') : (err || 'Login failed'))
+        setError('Login failed. Please try again.')
       }
-    } catch {
-      setError('Could not reach server')
     }
     setLoading(false)
   }
-
-  useEffect(() => {
-    if (localStorage.getItem('lucky_admin_token') === '1') {
-      navigate('/')
-    }
-  }, [navigate])
 
   return (
     <main className="login-page">
@@ -48,11 +38,12 @@ export default function Login({ onLogin }) {
         <h1 className="login-title">LUCKY ADMIN</h1>
         <form onSubmit={submit}>
           {error && <p className="form-error">{error}</p>}
-          <label>Username
+          <label>Admin Email
             <input
+              type="email"
               value={user}
               onChange={(e) => setUser(e.target.value)}
-              placeholder="Enter username"
+              placeholder="admin@example.com"
               autoComplete="username"
             />
           </label>
@@ -69,7 +60,7 @@ export default function Login({ onLogin }) {
             {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
-        <p className="login-hint">Default: admin / lucky123</p>
+        <p className="login-hint">Login with your Firebase admin account</p>
       </div>
     </main>
   )

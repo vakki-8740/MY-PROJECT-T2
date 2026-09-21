@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-
-const API = `${import.meta.env.VITE_API_URL || ''}/admin.php`
+import { fetchStats } from '../lib/db.js'
 
 export default function Dashboard() {
   const [stats, setStats] = useState(null)
 
   useEffect(() => {
-    fetch(`${API}?action=stats`)
-      .then((r) => r.json())
-      .then(setStats)
-      .catch(() => {})
+    fetchStats().then(setStats).catch(() => setStats({}))
+    const t = setInterval(() => fetchStats().then(setStats).catch(() => {}), 15000)
+    return () => clearInterval(t)
   }, [])
 
   const cards = stats ? [
@@ -64,7 +62,7 @@ export default function Dashboard() {
         ))}
       </div>
       <div className="admin-note">
-        All ticket details are stored securely. Passwords are visible only to Admin.
+        Live data from Firebase. Ticket details are stored securely.
       </div>
     </main>
   )

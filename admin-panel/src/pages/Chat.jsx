@@ -1,39 +1,30 @@
 import React, { useState, useEffect } from 'react'
-
-const API = `${import.meta.env.VITE_API_URL || ''}/chat.php`
+import { sendChatMessage, deleteChatMessage, subscribeChat } from '../lib/db.js'
 
 export default function Chat() {
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(true)
 
-  const load = () => {
-    setLoading(true)
-    fetch(API)
-      .then((r) => r.json())
-      .then((res) => setMessages(res.messages || []))
-      .catch(() => {})
-      .finally(() => setLoading(false))
-  }
-
-  useEffect(() => { load() }, [])
+  useEffect(() => {
+    const unsub = subscribeChat((list) => {
+      setMessages(list)
+      setLoading(false)
+    })
+    return () => unsub()
+  }, [])
 
   const send = async (e) => {
     e.preventDefault()
     const text = input.trim()
     if (!text) return
     setInput('')
-    await fetch(API, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: text, sender: 'admin' }),
-    })
-    load()
+    await sendChatMessage('admin', text).catch(() => {})
   }
 
   const del = (id) => {
     if (!window.confirm('Delete this message?')) return
-    fetch(`${API}?id=${id}`, { method: 'DELETE' }).then(load).catch(() => {})
+    deleteChatMessage(id).catch(() => {})
   }
 
   return (
@@ -46,7 +37,8 @@ export default function Chat() {
           <div key={m.id} className={`msg-row ${m.sender === 'user' ? 'mine' : ''}`}>
             <div className="msg" onClick={() => {}}>
               {m.message}
-              <span className="msg-time">{m.sender === 'user' ? 'User' : 'Admin'} · {m.created_at}</span>
+              {m.edited && <span className="edited"> (edited)</span>}
+              <span className="msg-time">{m.sender === 'user' ? 'User' : 'Admin'} · {m.created_at ? new Date(m.created_at).toLocaleString() : ''}</span>
             </div>
             {m.sender === 'user' && (
               <button className="msg-menu-btn" onClick={() => del(m.id)} title="Delete">🗑</button>
