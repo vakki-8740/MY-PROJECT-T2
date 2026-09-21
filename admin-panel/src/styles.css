@@ -51,6 +51,38 @@ body {
   animation: fadeUp 0.5s ease both;
 }
 
+.btn {
+  background: var(--blue); color: #fff; border: none; padding: 14px 22px; border-radius: 14px;
+  font-size: 1rem; font-weight: 600; cursor: pointer; font-family: inherit;
+  transition: transform 0.15s ease, background 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 14px rgba(0, 122, 255, 0.3);
+}
+.btn:hover { background: #0071eb; }
+.btn:active { transform: scale(0.96); box-shadow: none; }
+.submit-btn { margin-top: 6px; width: 100%; }
+.send-btn { padding: 12px 22px; border-radius: 20px; }
+
+.form-error {
+  background: #ffe9e7; color: var(--red);
+  padding: 11px 14px; border-radius: 12px; font-size: 0.85rem;
+  animation: shake 0.4s ease;
+}
+
+.ticket-form { display: flex; flex-direction: column; gap: 14px; margin-bottom: 30px; animation: fadeUp 0.5s ease 0.1s both; }
+.form-card {
+  background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow);
+  padding: 18px 16px; display: flex; flex-direction: column; gap: 14px;
+}
+.ticket-form label { display: flex; flex-direction: column; gap: 6px; font-weight: 600; font-size: 0.85rem; color: #3a3a3c; }
+.ticket-form input, .ticket-form select {
+  padding: 13px; border: 1.5px solid var(--border); border-radius: 12px;
+  font-size: 1rem; background: #f7f7f8; font-family: inherit; color: var(--ink);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+.ticket-form input:focus, .ticket-form select:focus {
+  outline: none; border-color: var(--blue); background: #fff; box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
+}
+
 .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
 .stat-card {
   background: var(--card); border-radius: var(--radius); padding: 14px;
@@ -71,6 +103,7 @@ body {
   display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
 .stat-icon svg { width: 22px; height: 22px; }
+.stat-text { flex: 1; min-width: 0; }
 .stat-value { font-size: 1.3rem; font-weight: 700; letter-spacing: -0.5px; }
 .stat-label { font-size: 0.75rem; color: var(--muted); }
 
@@ -175,6 +208,7 @@ body {
 
 @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
 @keyframes pop { from { opacity: 0; transform: scale(0.85); } to { opacity: 1; transform: scale(1); } }
+@keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
 
 @media (max-width: 360px) {
   .stats-grid { grid-template-columns: 1fr; }
