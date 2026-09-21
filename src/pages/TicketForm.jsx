@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 
 const config = {
   deposit: {
-    title: 'Deposit Problem',
+    title: 'Create Deposit Problem Ticket',
     problemOptions: ['Pending', 'Reject', 'Processing', 'Not Received in Game Account'],
     amountLabel: 'Enter Deposit Amount',
     amountPlaceholder: 'e.g. 500',
@@ -11,7 +11,7 @@ const config = {
     api: `${import.meta.env.VITE_API_URL || ''}/tickets.php?type=deposit`,
   },
   withdrawal: {
-    title: 'Withdrawal Problem',
+    title: 'Create Withdrawal Problem Ticket',
     problemOptions: ['Pending', 'Reject', 'Processing', 'Not Received in Bank Account'],
     amountLabel: 'Enter Withdrawal Amount',
     amountPlaceholder: 'e.g. 1000',
@@ -19,7 +19,7 @@ const config = {
     api: `${import.meta.env.VITE_API_URL || ''}/tickets.php?type=withdrawal`,
   },
   email: {
-    title: 'E-Mail ID Verification',
+    title: 'Create Email ID Verification Ticket',
     problemOptions: null,
     amountLabel: 'Enter Your Email ID (For Verification)',
     amountPlaceholder: 'you@example.com',
@@ -37,6 +37,7 @@ export default function TicketForm({ type = 'deposit' }) {
   })
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState('')
+  const [imageName, setImageName] = useState('')
 
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value })
 
@@ -113,9 +114,38 @@ export default function TicketForm({ type = 'deposit' }) {
           />
         </label>
 
-        <label>{cfg.uploadLabel}
-          <input required type="file" accept="image/*" onChange={(e) => setForm({ ...form, image: e.target.files[0] })} />
-        </label>
+        <div className="upload-box" onClick={() => document.getElementById('ticket-image').click()}>
+          <input
+            id="ticket-image"
+            type="file"
+            accept="image/*"
+            hidden
+            onChange={(e) => {
+              const f = e.target.files[0]
+              setForm({ ...form, image: f })
+              setImageName(f ? f.name : '')
+            }}
+          />
+          {form.image ? (
+            <div className="upload-preview">
+              <img src={URL.createObjectURL(form.image)} alt="preview" />
+              <span className="upload-name">{imageName}</span>
+              <span className="upload-change">Tap to change</span>
+            </div>
+          ) : (
+            <div className="upload-empty">
+              <span className="upload-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="4" />
+                  <circle cx="9" cy="9" r="2" />
+                  <path d="m21 15-4.5-4.5L7 20" />
+                </svg>
+              </span>
+              <span className="upload-title">{cfg.uploadLabel}</span>
+              <span className="upload-hint">Tap to select an image (JPG, PNG)</span>
+            </div>
+          )}
+        </div>
 
         <button type="submit" className="btn submit-btn">Submit Request</button>
         {error && <p className="form-error">{error}</p>}
