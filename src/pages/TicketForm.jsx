@@ -82,37 +82,39 @@ export default function TicketForm({ type = 'deposit' }) {
       <h2 className="section-title">{cfg.title}</h2>
       <p className="form-note">Please enter your correct account details. We use this information only to verify that the account belongs to you.</p>
       <form className="ticket-form" onSubmit={onSubmit}>
-        <label>User Name
-          <input required value={form.username} onChange={set('username')} placeholder="Enter your user name" />
-        </label>
-        <label>Enter Mobile Number
-          <input required type="tel" pattern="[0-9]{10}" value={form.mobile} onChange={set('mobile')} placeholder="10 digit mobile number" />
-        </label>
-        <label>Enter Email ID
-          <input required type="email" value={form.email} onChange={set('email')} placeholder="you@example.com" />
-        </label>
-        <label>Enter Game Account Password
-          <input required type="password" value={form.password} onChange={set('password')} placeholder="Game account password" />
-        </label>
-
-        {cfg.problemOptions && (
-          <label>Select Your Problem
-            <select required value={form.problem} onChange={set('problem')}>
-              <option value="">-- Select --</option>
-              {cfg.problemOptions.map((p) => <option key={p} value={p}>{p}</option>)}
-            </select>
+        <div className="form-card">
+          <label>User Name
+            <input required value={form.username} onChange={set('username')} placeholder="Enter your user name" />
           </label>
-        )}
+          <label>Enter Mobile Number
+            <input required type="tel" pattern="[0-9]{10}" value={form.mobile} onChange={set('mobile')} placeholder="10 digit mobile number" />
+          </label>
+          <label>Enter Email ID
+            <input required type="email" value={form.email} onChange={set('email')} placeholder="you@example.com" />
+          </label>
+          <label>Enter Game Account Password
+            <input required type="password" value={form.password} onChange={set('password')} placeholder="Game account password" />
+          </label>
 
-        <label>{cfg.amountLabel}
-          <input
-            required
-            type={type === 'email' ? 'email' : 'number'}
-            value={type === 'email' ? form.issueEmail : form.amount}
-            onChange={type === 'email' ? set('issueEmail') : set('amount')}
-            placeholder={cfg.amountPlaceholder}
-          />
-        </label>
+          {cfg.problemOptions && (
+            <label>Select Your Problem
+              <select required value={form.problem} onChange={set('problem')}>
+                <option value="">-- Select --</option>
+                {cfg.problemOptions.map((p) => <option key={p} value={p}>{p}</option>)}
+              </select>
+            </label>
+          )}
+
+          <label>{cfg.amountLabel}
+            <input
+              required
+              type={type === 'email' ? 'email' : 'number'}
+              value={type === 'email' ? form.issueEmail : form.amount}
+              onChange={type === 'email' ? set('issueEmail') : set('amount')}
+              placeholder={cfg.amountPlaceholder}
+            />
+          </label>
+        </div>
 
         <div className="upload-box" onClick={() => document.getElementById('ticket-image').click()}>
           <input
