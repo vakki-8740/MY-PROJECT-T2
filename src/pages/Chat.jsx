@@ -1,30 +1,49 @@
 import React, { useState, useRef, useEffect } from 'react'
 
-let idCounter = 1
-const now = () => {
-  const d = new Date()
+const API = `${import.meta.env.VITE_API_URL || ''}/chat.php`
+
+const fmt = (serverTime) => {
+  const d = serverTime ? new Date(serverTime.replace(' ', 'T')) : new Date()
   return d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 }
 
 export default function Chat() {
-  const [messages, setMessages] = useState([
-    { id: 0, text: 'Welcome to Lucky Star Support! How can we help you today?', mine: false, time: now(), edited: false },
-  ])
+  const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
   const [popup, setPopup] = useState(null)
   const [menuFor, setMenuFor] = useState(null)
   const endRef = useRef(null)
 
+  const load = () => {
+    fetch(API)
+      .then((r) => r.json())
+      .then((res) => {
+        setMessages((res.messages || []).map((m) => ({
+          id: m.id,
+          text: m.message,
+          mine: m.sender === 'user',
+          time: fmt(m.created_at),
+          edited: !!m.edited,
+        })))
+      })
+      .catch(() => {})
+  }
+
+  useEffect(() => { load() }, [])
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages])
 
   const send = (e) => {
     e.preventDefault()
-    if (!input.trim()) return
-    setMessages([...messages, { id: idCounter++, text: input.trim(), mine: true, time: now(), edited: false }])
+    const text = input.trim()
+    if (!text) return
     setInput('')
-    setTimeout(() => {
-      setMessages((m) => [...m, { id: idCounter++, text: 'Thanks for your message! Our agent will reply shortly.', mine: false, time: now(), edited: false }])
-    }, 800)
+    fetch(API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: text, sender: 'user' }),
+    })
+      .then(load)
+      .catch(() => {})
   }
 
   const openMenu = (msg) => {
@@ -39,13 +58,17 @@ export default function Chat() {
   const editMsg = (msg) => {
     const t = window.prompt('Edit your message:', msg.text)
     if (t !== null && t.trim()) {
-      setMessages(messages.map((m) => m.id === msg.id ? { ...m, text: t.trim(), edited: true } : m))
+      fetch(`${API}?id=${msg.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: t.trim() }),
+      }).then(load).catch(() => {})
     }
     setMenuFor(null)
   }
 
   const deleteMsg = (msg) => {
-    setMessages(messages.filter((m) => m.id !== msg.id))
+    fetch(`${API}?id=${msg.id}`, { method: 'DELETE' }).then(load).catch(() => {})
     setMenuFor(null)
   }
 
@@ -57,6 +80,9 @@ export default function Chat() {
   return (
     <main className="page chat-page">
       <div className="chat-box">
+        {messages.length === 0 && (
+          <p className="chat-empty">Welcome to Lucky Star Support! How can we help you today?</p>
+        )}
         {messages.map((m) => (
           <div key={m.id} className={`msg-row ${m.mine ? 'mine' : ''}`}>
             <div className="msg" onClick={() => setPopup(m)}>

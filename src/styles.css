@@ -92,6 +92,10 @@ body { font-family: 'Trebuchet MS', 'Segoe UI', sans-serif; background: var(--bg
   font-size: 1rem; background: var(--card); font-family: inherit;
 }
 .ticket-form input:focus, .ticket-form select:focus { outline: none; border-color: var(--gold); }
+.form-error {
+  background: #fde8e2; border: 1px solid #f2c0b0; color: var(--red);
+  padding: 10px 14px; border-radius: 10px; font-size: 0.85rem;
+}
 
 .btn {
   background: linear-gradient(120deg, var(--gold), var(--gold-dark));
@@ -113,6 +117,7 @@ body { font-family: 'Trebuchet MS', 'Segoe UI', sans-serif; background: var(--bg
 
 .chat-page { display: flex; flex-direction: column; height: calc(100vh - 120px); }
 .chat-box { flex: 1; overflow-y: auto; padding: 4px 2px 12px; display: flex; flex-direction: column; gap: 10px; }
+.chat-empty { text-align: center; color: var(--muted); font-size: 0.9rem; padding: 20px 10px; }
 .msg-row { display: flex; align-items: flex-end; gap: 6px; }
 .msg-row.mine { justify-content: flex-end; }
 .msg {

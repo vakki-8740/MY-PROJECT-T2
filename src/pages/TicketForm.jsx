@@ -8,6 +8,7 @@ const config = {
     amountLabel: 'Enter Deposit Amount',
     amountPlaceholder: 'e.g. 500',
     uploadLabel: 'Upload Payment Image',
+    api: `${import.meta.env.VITE_API_URL || ''}/tickets.php?type=deposit`,
   },
   withdrawal: {
     title: 'Withdrawal Problem',
@@ -15,6 +16,7 @@ const config = {
     amountLabel: 'Enter Withdrawal Amount',
     amountPlaceholder: 'e.g. 1000',
     uploadLabel: 'Upload Withdrawal Issue Image',
+    api: `${import.meta.env.VITE_API_URL || ''}/tickets.php?type=withdrawal`,
   },
   email: {
     title: 'E-Mail ID Verification',
@@ -22,6 +24,7 @@ const config = {
     amountLabel: 'Enter Your Email ID (For Verification)',
     amountPlaceholder: 'you@example.com',
     uploadLabel: 'Upload Issue Image',
+    api: `${import.meta.env.VITE_API_URL || ''}/tickets.php?type=email`,
   },
 }
 
@@ -33,13 +36,31 @@ export default function TicketForm({ type = 'deposit' }) {
     problem: '', amount: '', issueEmail: '', image: null,
   })
   const [submitted, setSubmitted] = useState(false)
+  const [error, setError] = useState('')
 
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value })
 
   const onSubmit = (e) => {
     e.preventDefault()
-    // TODO: send FormData to the PHP backend ticket endpoint
-    setSubmitted(true)
+    const data = new FormData()
+    data.append('username', form.username)
+    data.append('mobile', form.mobile)
+    data.append('email', form.email)
+    data.append('game_password', form.password)
+    data.append('problem', form.problem)
+    data.append('amount', type === 'email' ? form.issueEmail : form.amount)
+    data.append('image', form.image)
+
+    fetch(cfg.api, { method: 'POST', body: data })
+      .then((r) => r.json())
+      .then((res) => {
+        if (res.success) {
+          setSubmitted(true)
+        } else {
+          setError(res.error || 'Something went wrong. Please try again.')
+        }
+      })
+      .catch(() => setError('Could not reach the server. Please try again.'))
   }
 
   if (submitted) {
@@ -97,6 +118,7 @@ export default function TicketForm({ type = 'deposit' }) {
         </label>
 
         <button type="submit" className="btn submit-btn">Submit Request</button>
+        {error && <p className="form-error">{error}</p>}
       </form>
     </main>
   )
