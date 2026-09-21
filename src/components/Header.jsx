@@ -14,7 +14,7 @@ export default function Header({ menuOpen, setMenuOpen }) {
           <span className="brand">LUCKY STAR</span>
         </Link>
         <button
-          className="menu-btn"
+          className={`menu-btn ${menuOpen ? 'x' : ''}`}
           aria-label="Menu"
           onClick={() => setMenuOpen(!menuOpen)}
         >
