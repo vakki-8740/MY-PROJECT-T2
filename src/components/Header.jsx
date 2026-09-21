@@ -1,4 +1,4 @@
-import React from 'react'
+﻿import React from 'react'
 import { Link } from 'react-router-dom'
 
 export default function Header({ menuOpen, setMenuOpen }) {
@@ -7,7 +7,7 @@ export default function Header({ menuOpen, setMenuOpen }) {
       <div className="header-inner">
         <Link to="/" className="logo-wrap" onClick={() => setMenuOpen(false)}>
           <img
-            src="/logo/Screenshot-2026-06-08-110811-removebg-preview.png"
+            src="/small-logo/Screenshot-2026-06-08-110811-removebg-preview.png"
             alt="Lucky Star"
             className="logo"
           />
@@ -31,3 +31,4 @@ export default function Header({ menuOpen, setMenuOpen }) {
     </header>
   )
 }
+
