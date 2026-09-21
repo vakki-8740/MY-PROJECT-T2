@@ -36,11 +36,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         date('Y-m-d H:i:s'),
     ]);
 
+    $alert = "🎫 New " . strtoupper($type) . " Ticket #" . db()->lastInsertId() . "\n"
+        . "User: " . trim($_POST['username']) . "\n"
+        . "Mobile: " . trim($_POST['mobile']) . "\n"
+        . "Email: " . trim($_POST['email']) . "\n"
+        . "Problem: " . trim($_POST['problem'] ?? '-');
+    send_telegram($alert);
+
     respond(['success' => true, 'ticket_id' => (int) db()->lastInsertId()], 201);
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    // NOTE: protect this in production (admin auth)
+    require_admin();
     if ($type !== '') {
         $stmt = db()->prepare('SELECT * FROM tickets WHERE type = ? ORDER BY id DESC');
         $stmt->execute([$type]);

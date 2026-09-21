@@ -53,6 +53,11 @@ function db(): PDO
             edited INTEGER NOT NULL DEFAULT 0,
             created_at TEXT NOT NULL
         )');
+
+        $pdo->exec('CREATE TABLE IF NOT EXISTS settings (
+            key TEXT PRIMARY KEY,
+            value TEXT
+        )');
     }
     return $pdo;
 }
@@ -86,4 +91,55 @@ function save_upload(string $field): ?string
         respond(['error' => 'Failed to save uploaded image'], 500);
     }
     return $name;
+}
+
+function get_setting(string $key, string $default = ''): string
+{
+    $stmt = db()->prepare('SELECT value FROM settings WHERE key = ?');
+    $stmt->execute([$key]);
+    $row = $stmt->fetch();
+    return $row ? (string) $row['value'] : $default;
+}
+
+function set_setting(string $key, string $value): void
+{
+    db()->prepare('INSERT INTO settings (key, value) VALUES (?, ?)
+        ON CONFLICT(key) DO UPDATE SET value = excluded.value')
+        ->execute([$key, $value]);
+}
+
+// Admin credentials (defaults, can be changed via settings)
+function check_admin(string $user, string $pass): bool
+{
+    $u = get_setting('admin_user', 'admin');
+    $p = get_setting('admin_pass', 'lucky123');
+    return hash_equals($u, $user) && hash_equals($p, $pass);
+}
+
+function require_admin(): void
+{
+    $user = $_SERVER['PHP_AUTH_USER'] ?? ($_GET['admin_user'] ?? '');
+    $pass = $_SERVER['PHP_AUTH_PW'] ?? ($_GET['admin_pass'] ?? '');
+    if (!check_admin((string) $user, (string) $pass)) {
+        respond(['error' => 'Unauthorized'], 401);
+    }
+}
+
+function send_telegram(string $text): void
+{
+    $token = get_setting('telegram_bot_token');
+    $chatId = get_setting('telegram_chat_id');
+    if ($token === '' || $chatId === '') {
+        return;
+    }
+    $url = "https://api.telegram.org/bot{$token}/sendMessage";
+    $payload = json_encode(['chat_id' => $chatId, 'text' => $text]);
+    $ctx = stream_context_create(['http' => [
+        'method' => 'POST',
+        'header' => "Content-Type: application/json\r\n",
+        'content' => $payload,
+        'timeout' => 5,
+        'ignore_errors' => true,
+    ]]);
+    @file_get_contents($url, false, $ctx);
 }

@@ -20,6 +20,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt = db()->prepare('INSERT INTO chat_messages (sender, message, created_at) VALUES (?, ?, ?)');
     $stmt->execute([$sender, $message, date('Y-m-d H:i:s')]);
 
+    if ($sender === 'user') {
+        send_telegram("💬 New user chat message:\n" . $message);
+    }
+
     $stmt = db()->prepare('SELECT * FROM chat_messages WHERE id = ?');
     $stmt->execute([db()->lastInsertId()]);
     respond(['message' => $stmt->fetch()], 201);
