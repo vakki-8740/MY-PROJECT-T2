@@ -3,46 +3,20 @@ import { Link } from 'react-router-dom'
 
 const options = [
   {
-    to: '/deposit', color: 'blue', label: 'Deposit Problem',
+    to: '/deposit', img: '/icons/deposit.jpg', label: 'Deposit Problem',
     desc: 'Deposit pending, rejected or not received in game account?',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="2" y="6" width="20" height="13" rx="3" />
-        <path d="M2 10h20" />
-        <path d="M6 15h4" />
-      </svg>
-    ),
   },
   {
-    to: '/withdrawal', color: 'green', label: 'Withdrawal Problem',
+    to: '/withdrawal', img: '/icons/withdrawal.jpg', label: 'Withdrawal Problem',
     desc: 'Withdrawal pending, rejected or not received in bank account?',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 3v12" />
-        <path d="m7 10 5 5 5-5" />
-        <path d="M4 21h16" />
-      </svg>
-    ),
   },
   {
-    to: '/email-verification', color: 'orange', label: 'E-Mail ID Verification',
+    to: '/email-verification', img: '/icons/email.jpg', label: 'E-Mail ID Verification',
     desc: 'Verify your email ID with our support team.',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="2" y="4" width="20" height="16" rx="3" />
-        <path d="m2 7 10 7 10-7" />
-      </svg>
-    ),
   },
   {
-    to: '/chat', color: 'purple', label: 'Online Chat',
+    to: '/chat', img: '/icons/chat.jpg', label: 'Online Chat',
     desc: 'Talk live with our support team.',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M21 12a8 8 0 0 1-8 8H4l1.5-3A8 8 0 1 1 21 12Z" />
-        <path d="M9 12h.01M13 12h.01M17 12h.01" />
-      </svg>
-    ),
   },
 ]
 
@@ -64,7 +38,7 @@ export default function Home() {
       <section className="options">
         {options.map((o) => (
           <Link to={o.to} className="option-card" key={o.label}>
-            <span className={`option-icon ${o.color}`}>{o.icon}</span>
+            <img src={o.img} alt="" className="option-icon img" />
             <div className="option-text">
               <h3>{o.label}</h3>
               <p>{o.desc}</p>

@@ -89,6 +89,7 @@ body {
   display: flex; align-items: center; justify-content: center;
   animation: pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
 }
+.option-icon.img { object-fit: cover; background: #fff; }
 .option-card:nth-child(1) .option-icon { animation-delay: 0.15s; }
 .option-card:nth-child(2) .option-icon { animation-delay: 0.22s; }
 .option-card:nth-child(3) .option-icon { animation-delay: 0.29s; }
