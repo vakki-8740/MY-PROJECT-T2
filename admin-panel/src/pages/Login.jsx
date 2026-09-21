@@ -20,11 +20,12 @@ export default function Login({ onLogin }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: user, password: pass }),
       })
-      const data = await res.json()
+      const data = await res.json().catch(() => ({}))
       if (data.success) {
         onLogin()
       } else {
-        setError(data.error || 'Login failed')
+        const err = data.error
+        setError(typeof err === 'object' && err ? (err.message || 'Login failed') : (err || 'Login failed'))
       }
     } catch {
       setError('Could not reach server')

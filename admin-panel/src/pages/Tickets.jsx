@@ -16,7 +16,11 @@ export default function Tickets() {
     fetch(`${API}?action=tickets_list`)
       .then((r) => r.json())
       .then((data) => {
-        if (data.error) { setError(data.error); setTickets([]) }
+        if (data.error) {
+          const err = data.error
+          setError(typeof err === 'object' && err ? (err.message || 'Server error') : err)
+          setTickets([])
+        }
         else { setTickets(data.tickets || []) }
       })
       .catch(() => { setError('Server error'); setTickets([]) })
