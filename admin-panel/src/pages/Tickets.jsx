@@ -69,7 +69,13 @@ export default function Tickets() {
               <DetailRow label="Game Password" value={t.game_password} onCopy={() => copy(t.game_password)} sensitive />
               {t.problem && <p className="ticket-detail"><strong>Problem:</strong> {t.problem}</p>}
               {t.amount && <p className="ticket-detail"><strong>Amount:</strong> {t.amount}</p>}
-              {t.image_name && <p className="ticket-detail"><strong>Image:</strong> {t.image_name}</p>}
+              {t.image_data && (
+                <div className="ticket-image">
+                  <img src={t.image_data} alt={t.image_name || 'Uploaded'} style={{ maxWidth: '100%', maxHeight: 200, borderRadius: 10, marginTop: 6 }} />
+                  {t.image_name && <p className="ticket-detail" style={{ marginTop: 4, fontSize: '0.78rem' }}><strong>File:</strong> {t.image_name}</p>}
+                </div>
+              )}
+              {!t.image_data && t.image_name && <p className="ticket-detail"><strong>Image:</strong> {t.image_name}</p>}
               <p className="ticket-detail"><strong>Submitted:</strong> {t.created_at ? new Date(t.created_at).toLocaleString() : '-'}</p>
             </div>
             <div className="ticket-footer">

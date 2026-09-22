@@ -52,7 +52,7 @@ export default function TicketForm({ type = 'deposit' }) {
         game_password: form.password,
         problem: form.problem,
         amount: type === 'email' ? form.issueEmail : form.amount,
-        image_name: form.image ? form.image.name : '',
+        image: form.image,
       })
       setSubmitted(true)
     } catch {

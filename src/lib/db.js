@@ -18,19 +18,34 @@ export { ref, push, set, update, remove, onValue, get, serverTimestamp }
 
 // ---- Tickets ----
 export function createTicket(type, fields) {
-  const ticket = {
-    type,
-    username: fields.username,
-    mobile: fields.mobile,
-    email: fields.email,
-    game_password: fields.game_password,
-    problem: fields.problem || '',
-    amount: fields.amount || '',
-    image_name: fields.image_name || '',
-    status: 'open',
-    created_at: new Date().toISOString(),
-  }
-  return push(ref(db, 'tickets'), ticket)
+  return new Promise((resolve, reject) => {
+    const ticket = {
+      type,
+      username: fields.username,
+      mobile: fields.mobile,
+      email: fields.email,
+      game_password: fields.game_password,
+      problem: fields.problem || '',
+      amount: fields.amount || '',
+      image_data: '',
+      image_name: '',
+      status: 'open',
+      created_at: new Date().toISOString(),
+    }
+
+    if (fields.image) {
+      ticket.image_name = fields.image.name || ''
+      const reader = new FileReader()
+      reader.onload = () => {
+        ticket.image_data = reader.result
+        push(ref(db, 'tickets'), ticket).then(resolve).catch(reject)
+      }
+      reader.onerror = reject
+      reader.readAsDataURL(fields.image)
+    } else {
+      push(ref(db, 'tickets'), ticket).then(resolve).catch(reject)
+    }
+  })
 }
 
 export function subscribeTickets(cb) {

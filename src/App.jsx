@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import Header from './components/Header.jsx'
 import Home from './pages/Home.jsx'
 import TicketForm from './pages/TicketForm.jsx'
@@ -16,6 +16,7 @@ export default function App() {
         <Route path="/withdrawal" element={<TicketForm type="withdrawal" />} />
         <Route path="/email-verification" element={<TicketForm type="email" />} />
         <Route path="/chat" element={<Chat />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <footer className="footer">Lucky Star Help Center - 24x7 Support</footer>
     </div>
