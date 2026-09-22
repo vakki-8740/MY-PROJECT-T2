@@ -1,35 +1,22 @@
-import { auth } from './firebase.js'
-import { onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js'
-import { currentUser, setCurrentUser, currentPage, setCurrentPage, menuOpen, setMenuOpen } from './state.js'
-import { renderLogin } from './pages/login.js'
+import { appEl } from './state.js'
 import { renderDashboard } from './pages/dashboard.js'
 import { renderTickets } from './pages/tickets.js'
 import { renderChat } from './pages/chat.js'
 import { renderSettings } from './pages/settings.js'
+import { toggleMenu, closeMenu } from './pages/header.js'
 
-// ---- Router ----
+let currentPage = ''
+
 function navigate(page) {
-  setCurrentPage(page)
-  setMenuOpen(false)
+  currentPage = page
+  closeMenu()
   render()
 }
 window.navigate = navigate
+window.toggleMenu = () => { toggleMenu(); render() }
 
-window.handleLogout = async () => {
-  await signOut(auth)
-}
-
-// ---- Auth Observer ----
-onAuthStateChanged(auth, (user) => {
-  setCurrentUser(user)
-  render()
-})
-
-// ---- Render ----
 function render() {
-  if (!currentUser) {
-    renderLogin()
-  } else if (currentPage === 'tickets') {
+  if (currentPage === 'tickets') {
     renderTickets()
   } else if (currentPage === 'chat') {
     renderChat()
@@ -40,7 +27,6 @@ function render() {
   }
 }
 
-// ---- Toast ----
 function showToast(msg) {
   const el = document.createElement('div')
   el.className = 'toast'
@@ -50,5 +36,4 @@ function showToast(msg) {
 }
 window.showToast = showToast
 
-// ---- Menu Toggle ----
-window.toggleMenu = () => { setMenuOpen(!menuOpen); render() }
+render()

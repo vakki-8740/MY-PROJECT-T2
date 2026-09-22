@@ -1,8 +1,20 @@
-import { currentUser, menuOpen } from '../state.js'
 import { icons } from '../icons.js'
 
+let menuOpen = false
+
+export function toggleMenu() {
+  menuOpen = !menuOpen
+}
+
+export function isMenuOpen() {
+  return menuOpen
+}
+
+export function closeMenu() {
+  menuOpen = false
+}
+
 export function headerHTML() {
-  const email = currentUser?.email || ''
   return `
     <header class="header">
       <div class="header-inner">
@@ -18,7 +30,6 @@ export function headerHTML() {
         <a href="#" onclick="navigate('chat');return false">${icons.messageCircle} User Chat</a>
         <a href="#" onclick="navigate('settings');return false">${icons.settings} Settings</a>
       </nav>
-      <div class="admin-email">${email}</div>
     </header>
   `
 }

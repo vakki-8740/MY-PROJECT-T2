@@ -1,8 +1,10 @@
 import { db } from '../firebase.js'
 import { ref, push, remove, onValue } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js'
-import { appEl, setUnsubChat, getUnsubChat, $ } from '../state.js'
+import { appEl, $ } from '../state.js'
 import { icons } from '../icons.js'
 import { headerHTML } from './header.js'
+
+let unsubChat = null
 
 window.sendMsg = async (e) => {
   e.preventDefault()
@@ -26,10 +28,9 @@ window.deleteMsg = (id) => {
 
 export function renderChat() {
   appEl.innerHTML = headerHTML() + `<main class="page"><p class="empty">Loading messages...</p></main>`
-  const prev = getUnsubChat()
-  if (prev) prev()
+  if (unsubChat) unsubChat()
 
-  const unsub = onValue(ref(db, 'chat_messages'), (snap) => {
+  unsubChat = onValue(ref(db, 'chat_messages'), (snap) => {
     const val = snap.val() || {}
     const list = Object.entries(val)
       .map(([id, m]) => ({ id, ...m }))
@@ -65,5 +66,4 @@ export function renderChat() {
     `
     appEl.innerHTML = html
   })
-  setUnsubChat(unsub)
 }

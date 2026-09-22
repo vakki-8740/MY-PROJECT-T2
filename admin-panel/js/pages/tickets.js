@@ -1,10 +1,11 @@
 import { db } from '../firebase.js'
 import { ref, onValue, update, remove } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js'
-import { appEl, setUnsubTickets, getUnsubTickets } from '../state.js'
+import { appEl } from '../state.js'
 import { icons } from '../icons.js'
 import { headerHTML } from './header.js'
 
 let imageDataCache = {}
+let unsubTickets = null
 
 function cacheImageData(id, data) {
   imageDataCache[id] = data
@@ -58,10 +59,9 @@ window.copyText = (text) => {
 
 export function renderTickets() {
   appEl.innerHTML = headerHTML() + `<main class="page"><p class="empty">Loading tickets...</p></main>`
-  const prev = getUnsubTickets()
-  if (prev) prev()
+  if (unsubTickets) unsubTickets()
 
-  const unsub = onValue(ref(db, 'tickets'), (snap) => {
+  unsubTickets = onValue(ref(db, 'tickets'), (snap) => {
     const val = snap.val() || {}
     const list = Object.entries(val)
       .map(([id, t]) => ({ id, ...t }))
@@ -111,5 +111,4 @@ export function renderTickets() {
     html += `</main>`
     appEl.innerHTML = html
   })
-  setUnsubTickets(unsub)
 }

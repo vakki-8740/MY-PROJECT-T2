@@ -1,6 +1,6 @@
 import { db } from '../firebase.js'
 import { ref, get } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js'
-import { appEl, currentUser } from '../state.js'
+import { appEl } from '../state.js'
 import { icons } from '../icons.js'
 import { headerHTML } from './header.js'
 
