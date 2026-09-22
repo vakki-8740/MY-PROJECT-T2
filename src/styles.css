@@ -270,6 +270,19 @@ body {
 .popup p { margin-bottom: 9px; font-size: 0.9rem; color: #3a3a3c; }
 .popup .btn { width: 100%; margin-top: 12px; }
 
+/* Profile Popup */
+.profile-popup { max-width: 340px; }
+.profile-subtitle { color: var(--muted); font-size: 0.82rem !important; margin-bottom: 16px !important; }
+.profile-input {
+  width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 12px;
+  font-size: 0.9rem; margin-bottom: 10px; background: var(--bg);
+  font-family: inherit; outline: none; transition: border-color 0.2s;
+}
+.profile-input:focus { border-color: var(--blue); }
+.profile-input::placeholder { color: var(--muted); }
+.profile-btn { margin-top: 6px !important; background: var(--green) !important; }
+.profile-error { color: var(--red); font-size: 0.82rem; margin-bottom: 10px; background: #fef2f2; padding: 8px 12px; border-radius: 10px; }
+
 .footer {
   text-align: center; padding: 18px; font-size: 0.78rem;
   background: transparent; color: var(--muted);

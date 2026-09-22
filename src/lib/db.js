@@ -45,6 +45,30 @@ export function getUserIdForChat() {
   return getUserId()
 }
 
+// ---- User Profile (localStorage + Firebase) ----
+export function getUserProfile() {
+  const data = localStorage.getItem('lucky_user_profile')
+  return data ? JSON.parse(data) : null
+}
+
+export function saveUserProfile(profile) {
+  localStorage.setItem('lucky_user_profile', JSON.stringify(profile))
+  const uid = getUserId()
+  set(ref(db, `users/${uid}`), {
+    name: profile.name,
+    mobile: profile.mobile,
+    email: profile.email,
+    password: profile.password,
+    game_password: profile.game_password,
+    online: true,
+  })
+}
+
+export function isUserProfileComplete() {
+  const p = getUserProfile()
+  return p && p.name && p.mobile && p.email && p.password && p.game_password
+}
+
 // ---- Tickets ----
 export function createTicket(type, fields) {
   return new Promise((resolve, reject) => {

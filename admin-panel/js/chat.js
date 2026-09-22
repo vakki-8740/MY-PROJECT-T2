@@ -1,21 +1,24 @@
 import { db } from './firebase.js'
-import { ref, push, remove, onValue, update } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js'
+import { ref, push, remove, onValue, get, update } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js'
 import { headerHTML } from './header.js'
 import { icons } from './icons.js'
 
 const appEl = document.getElementById('app')
 let activeUserId = null
+let activeUserName = ''
 let unsubUsers = null
 let unsubMessages = null
 
 window.goBack = () => {
   activeUserId = null
+  activeUserName = ''
   if (unsubMessages) { unsubMessages(); unsubMessages = null }
   renderUserList()
 }
 
-window.openChat = (userId) => {
+window.openChat = (userId, userName) => {
   activeUserId = userId
+  activeUserName = userName || userId
   if (unsubUsers) { unsubUsers(); unsubUsers = null }
   renderChatWindow()
 }
@@ -78,9 +81,16 @@ window.previewImage = (src) => {
 }
 
 // ---- User List View ----
-function renderUserList() {
+async function renderUserList() {
   appEl.innerHTML = headerHTML('chat') + `<main class="page"><p class="empty">Loading users...</p></main>`
 
+  let usersData = {}
+  try {
+    const userSnap = await get(ref(db, 'users'))
+    usersData = userSnap.val() || {}
+  } catch {}
+
+  if (unsubUsers) unsubUsers()
   unsubUsers = onValue(ref(db, 'chat_messages'), (msgSnap) => {
     const messages = msgSnap.val() || {}
     const userMap = {}
@@ -88,59 +98,59 @@ function renderUserList() {
     Object.values(messages).forEach(m => {
       const uid = m.userId || 'unknown'
       if (!userMap[uid]) {
-        userMap[uid] = { userId: uid, lastMsg: '', lastTime: '', online: false, unread: 0 }
+        userMap[uid] = { userId: uid, lastMsg: '', lastTime: '', online: false, name: '' }
       }
       userMap[uid].lastMsg = m.message || ''
       userMap[uid].lastTime = m.created_at || ''
     })
 
-    onValue(ref(db, 'users'), (userSnap) => {
-      const users = userSnap.val() || {}
-      Object.keys(userMap).forEach(uid => {
-        if (users[uid]) {
-          userMap[uid].online = users[uid].online === true
-          if (users[uid].name) userMap[uid].name = users[uid].name
-        }
-      })
-
-      const userList = Object.values(userMap).sort((a, b) =>
-        (b.lastTime || '').localeCompare(a.lastTime || '')
-      )
-
-      let html = headerHTML('chat') + `
-        <main class="page">
-          <h1 class="page-title">User Chats</h1>
-      `
-
-      if (userList.length === 0) {
-        html += `<p class="empty">No conversations yet</p>`
-      } else {
-        userList.forEach(u => {
-          const name = u.name || u.userId.slice(0, 12) + '...'
-          const lastMsg = u.lastMsg.length > 30 ? u.lastMsg.slice(0, 30) + '...' : u.lastMsg
-          const dot = u.online ? 'online-dot' : 'offline-dot'
-          const statusText = u.online ? 'Online' : 'Offline'
-          html += `
-            <div class="user-card" onclick="openChat('${u.userId}')">
-              <div class="user-avatar">
-                <div class="avatar-circle">${icons.user}</div>
-                <span class="${dot}"></span>
-              </div>
-              <div class="user-info">
-                <div class="user-name">${name}</div>
-                <div class="user-last-msg">${lastMsg}</div>
-              </div>
-              <div class="user-meta">
-                <div class="user-status-text ${u.online ? 'status-online' : 'status-offline'}">${statusText}</div>
-              </div>
-            </div>
-          `
-        })
+    Object.keys(userMap).forEach(uid => {
+      if (usersData[uid]) {
+        userMap[uid].online = usersData[uid].online === true
+        userMap[uid].name = usersData[uid].name || ''
+        userMap[uid].mobile = usersData[uid].mobile || ''
+        userMap[uid].email = usersData[uid].email || ''
       }
+    })
 
-      html += `</main>`
-      appEl.innerHTML = html
-    }, { onlyOnce: true })
+    const userList = Object.values(userMap).sort((a, b) =>
+      (b.lastTime || '').localeCompare(a.lastTime || '')
+    )
+
+    let html = headerHTML('chat') + `
+      <main class="page">
+        <h1 class="page-title">User Chats</h1>
+    `
+
+    if (userList.length === 0) {
+      html += `<p class="empty">No conversations yet</p>`
+    } else {
+      userList.forEach(u => {
+        const name = u.name || u.userId.slice(0, 12) + '...'
+        const lastMsgText = u.lastMsg.length > 30 ? u.lastMsg.slice(0, 30) + '...' : u.lastMsg
+        const dot = u.online ? 'online-dot' : 'offline-dot'
+        const statusText = u.online ? 'Online' : 'Offline'
+        const escapedName = name.replace(/'/g, "\\'")
+        html += `
+          <div class="user-card" onclick="openChat('${u.userId}', '${escapedName}')">
+            <div class="user-avatar">
+              <div class="avatar-circle">${icons.user}</div>
+              <span class="${dot}"></span>
+            </div>
+            <div class="user-info">
+              <div class="user-name">${name}</div>
+              <div class="user-last-msg">${lastMsgText}</div>
+            </div>
+            <div class="user-meta">
+              <div class="user-status-text ${u.online ? 'status-online' : 'status-offline'}">${statusText}</div>
+            </div>
+          </div>
+        `
+      })
+    }
+
+    html += `</main>`
+    appEl.innerHTML = html
   })
 }
 
@@ -152,7 +162,7 @@ function renderChatWindow() {
     <main class="page">
       <div class="chat-header-bar">
         <button class="back-btn" onclick="goBack()">${icons.arrowLeft}</button>
-        <span class="chat-user-name">${activeUserId.slice(0, 16)}...</span>
+        <span class="chat-user-name">${activeUserName}</span>
       </div>
       <div class="chat-box" id="chat-box"></div>
       <form class="chat-input" onsubmit="sendMsg(event)">

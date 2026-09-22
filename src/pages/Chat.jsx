@@ -1,9 +1,46 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { sendChatMessage, editChatMessage, deleteChatMessage, subscribeChat, trackPresence, getUserIdForChat } from '../lib/db.js'
+import { sendChatMessage, editChatMessage, deleteChatMessage, subscribeChat, trackPresence, getUserIdForChat, isUserProfileComplete, saveUserProfile } from '../lib/db.js'
 
 const fmt = (iso) => {
   const d = iso ? new Date(iso) : new Date()
   return d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+}
+
+function ProfilePopup({ onSubmit }) {
+  const [form, setForm] = useState({ name: '', mobile: '', email: '', password: '', game_password: '' })
+  const [error, setError] = useState('')
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value })
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    if (!form.name || !form.mobile || !form.email || !form.password || !form.game_password) {
+      setError('Please fill all fields')
+      return
+    }
+    saveUserProfile(form)
+    onSubmit()
+  }
+
+  return (
+    <div className="popup-overlay">
+      <div className="popup profile-popup" onClick={(e) => e.stopPropagation()}>
+        <h3>Your Details</h3>
+        <p className="profile-subtitle">Fill in your details to start chatting</p>
+        {error && <p className="profile-error">{error}</p>}
+        <form onSubmit={handleSubmit}>
+          <input name="name" value={form.name} onChange={handleChange} placeholder="User Name" className="profile-input" />
+          <input name="mobile" value={form.mobile} onChange={handleChange} placeholder="Mobile Number" className="profile-input" />
+          <input name="email" type="email" value={form.email} onChange={handleChange} placeholder="Email ID" className="profile-input" />
+          <input name="password" type="password" value={form.password} onChange={handleChange} placeholder="Password" className="profile-input" />
+          <input name="game_password" value={form.game_password} onChange={handleChange} placeholder="Game Password" className="profile-input" />
+          <button type="submit" className="btn profile-btn">Start Chat</button>
+        </form>
+      </div>
+    </div>
+  )
 }
 
 export default function Chat() {
@@ -11,11 +48,15 @@ export default function Chat() {
   const [input, setInput] = useState('')
   const [popup, setPopup] = useState(null)
   const [menuFor, setMenuFor] = useState(null)
+  const [showProfile, setShowProfile] = useState(false)
   const endRef = useRef(null)
   const userIdRef = useRef(null)
 
   useEffect(() => {
     userIdRef.current = trackPresence()
+    if (!isUserProfileComplete()) {
+      setShowProfile(true)
+    }
   }, [])
 
   useEffect(() => {
@@ -24,6 +65,10 @@ export default function Chat() {
   }, [])
 
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages])
+
+  const handleProfileDone = () => {
+    setShowProfile(false)
+  }
 
   const send = (e) => {
     e.preventDefault()
@@ -69,6 +114,10 @@ export default function Chat() {
   const replyMsg = (msg) => {
     setInput('> ' + msg.message + ' ')
     setMenuFor(null)
+  }
+
+  if (showProfile) {
+    return <ProfilePopup onSubmit={handleProfileDone} />
   }
 
   return (
