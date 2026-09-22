@@ -3,10 +3,10 @@
   "outputDirectory": ".",
   "framework": null,
   "rewrites": [
-    { "source": "/admin-panel/dashboard", "destination": "/admin-panel/dashboard.html" },
-    { "source": "/admin-panel/tickets", "destination": "/admin-panel/tickets.html" },
-    { "source": "/admin-panel/chat", "destination": "/admin-panel/chat.html" },
-    { "source": "/admin-panel/settings", "destination": "/admin-panel/settings.html" },
-    { "source": "/admin-panel", "destination": "/admin-panel/dashboard.html" }
+    { "source": "/dashboard", "destination": "/dashboard.html" },
+    { "source": "/tickets", "destination": "/tickets.html" },
+    { "source": "/chat", "destination": "/chat.html" },
+    { "source": "/settings", "destination": "/settings.html" },
+    { "source": "/", "destination": "/dashboard.html" }
   ]
 }
