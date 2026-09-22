@@ -91,8 +91,8 @@ async function renderUserList() {
   } catch {}
 
   if (unsubUsers) unsubUsers()
-  unsubUsers = onValue(ref(db, 'chat_messages'), (msgSnap) => {
-    const messages = msgSnap.val() || {}
+
+  function buildUserList(messages) {
     const userMap = {}
 
     Object.values(messages).forEach(m => {
@@ -100,16 +100,14 @@ async function renderUserList() {
       if (!userMap[uid]) {
         userMap[uid] = { userId: uid, lastMsg: '', lastTime: '', online: false, name: '' }
       }
-      userMap[uid].lastMsg = m.message || ''
-      userMap[uid].lastTime = m.created_at || ''
+      if (m.message) userMap[uid].lastMsg = m.message
+      if (m.created_at) userMap[uid].lastTime = m.created_at
     })
 
     Object.keys(userMap).forEach(uid => {
       if (usersData[uid]) {
         userMap[uid].online = usersData[uid].online === true
         userMap[uid].name = usersData[uid].name || ''
-        userMap[uid].mobile = usersData[uid].mobile || ''
-        userMap[uid].email = usersData[uid].email || ''
       }
     })
 
@@ -151,6 +149,10 @@ async function renderUserList() {
 
     html += `</main>`
     appEl.innerHTML = html
+  }
+
+  unsubUsers = onValue(ref(db, 'chat_messages'), (msgSnap) => {
+    buildUserList(msgSnap.val() || {})
   })
 }
 
@@ -159,7 +161,7 @@ function renderChatWindow() {
   if (!activeUserId) return renderUserList()
 
   appEl.innerHTML = headerHTML('chat') + `
-    <main class="page">
+    <main class="page chat-page">
       <div class="chat-header-bar">
         <button class="back-btn" onclick="goBack()">${icons.arrowLeft}</button>
         <span class="chat-user-name">${activeUserName}</span>

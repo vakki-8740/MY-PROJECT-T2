@@ -13,11 +13,12 @@
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
+html { height: 100%; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background: var(--bg); color: var(--ink);
   -webkit-font-smoothing: antialiased;
-  min-height: 100vh;
+  min-height: 100%; height: 100%;
 }
 
 /* Header */
@@ -177,32 +178,42 @@ body {
   position: absolute; bottom: 0; right: 0; width: 12px; height: 12px;
   background: var(--muted); border-radius: 50%; border: 2px solid var(--card);
 }
-.user-info { flex: 1; min-width: 0; }
-.user-name { font-weight: 700; font-size: 0.9rem; margin-bottom: 2px; }
+.user-info { flex: 1; min-width: 0; overflow: hidden; }
+.user-name { font-weight: 700; font-size: 0.9rem; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .user-last-msg { font-size: 0.78rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .user-meta { flex-shrink: 0; }
 .user-status-text { font-size: 0.7rem; font-weight: 600; }
 .status-online { color: var(--green); }
 .status-offline { color: var(--muted); }
 
-/* Chat */
+/* Chat Page - Mobile Optimized */
+.chat-page {
+  display: flex; flex-direction: column;
+  height: calc(100vh - 50px); height: calc(100dvh - 50px);
+  padding: 0 !important; max-width: 100% !important;
+}
 .chat-header-bar {
-  display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
-  padding-bottom: 10px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px; background: var(--card);
+  border-bottom: 1px solid var(--border); flex-shrink: 0;
 }
 .back-btn {
   background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
   width: 36px; height: 36px; cursor: pointer; display: flex; align-items: center; justify-content: center;
-  color: var(--ink);
+  color: var(--ink); flex-shrink: 0;
 }
 .back-btn:active { background: var(--border); }
-.chat-user-name { font-weight: 700; font-size: 0.95rem; }
-.chat-box { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; min-height: 200px; max-height: 60vh; overflow-y: auto; }
+.chat-user-name { font-weight: 700; font-size: 0.95rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chat-box {
+  flex: 1; display: flex; flex-direction: column; gap: 8px;
+  padding: 12px 16px; overflow-y: auto; min-height: 0;
+  -webkit-overflow-scrolling: touch;
+}
 .chat-empty { text-align: center; color: var(--muted); padding: 30px; font-size: 0.9rem; }
 .msg-row { display: flex; align-items: flex-end; gap: 6px; }
 .msg-row.user { justify-content: flex-end; }
 .msg {
-  max-width: 78%; padding: 10px 13px; border-radius: 14px 14px 14px 4px;
+  max-width: 80%; padding: 10px 13px; border-radius: 14px 14px 14px 4px;
   font-size: 0.88rem; word-break: break-word; line-height: 1.4;
   background: var(--bg); border: 1px solid var(--border);
 }
@@ -213,13 +224,14 @@ body {
 .msg-del:active { opacity: 1; }
 .chat-img { max-width: 200px; border-radius: 8px; cursor: pointer; display: block; }
 .chat-input {
-  display: flex; gap: 8px; padding: 10px 0; align-items: center;
+  display: flex; gap: 8px; padding: 10px 16px; align-items: center;
   background: var(--card); border-top: 1px solid var(--border);
-  position: sticky; bottom: 0;
+  flex-shrink: 0; padding-bottom: max(10px, env(safe-area-inset-bottom));
 }
 .chat-input #chat-input {
   flex: 1; padding: 12px; border: 1px solid var(--border); border-radius: 20px;
   font-size: 0.9rem; background: var(--bg); font-family: inherit; outline: none;
+  min-width: 0;
 }
 .chat-input #chat-input:focus { border-color: var(--blue); }
 .img-btn {
@@ -244,6 +256,18 @@ body {
 
 /* Empty */
 .empty { text-align: center; color: var(--muted); padding: 40px 20px; }
+
+/* Mobile Adjustments */
+@media (max-width: 480px) {
+  .page { padding: 12px; }
+  .header-inner { padding: 10px 12px; }
+  .brand-name { font-size: 0.85rem; }
+  .chat-box { padding: 10px 12px; }
+  .chat-input { padding: 8px 12px; }
+  .msg { max-width: 85%; font-size: 0.85rem; }
+  .user-card { padding: 10px 12px; }
+  .avatar-circle { width: 40px; height: 40px; }
+}
 
 @media (min-width: 480px) {
   .page { padding: 20px; }
