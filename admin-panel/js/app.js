@@ -16,6 +16,23 @@ const app = initializeApp(firebaseConfig)
 const db = getDatabase(app)
 const auth = getAuth(app)
 
+// ---- SVG Icons ----
+const icons = {
+  clipboard: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>`,
+  clock: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>`,
+  creditCard: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>`,
+  arrowDown: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>`,
+  mail: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>`,
+  chat: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`,
+  copy: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`,
+  trash: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>`,
+  settings: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`,
+  dashboard: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>`,
+  ticket: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v5a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5a3 3 0 0 1 0-6V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/></svg>`,
+  messageCircle: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>`,
+  externalLink: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`,
+}
+
 const $ = (s) => document.querySelector(s)
 const appEl = $('#app')
 
@@ -89,7 +106,7 @@ function renderLogin() {
           </div>
           <button type="submit" class="btn btn-primary btn-block">Login</button>
         </form>
-        <p class="login-hint">Create user in Firebase Console → Authentication</p>
+        <p class="login-hint">Create user in Firebase Console &rarr; Authentication</p>
       </div>
     </div>
   `
@@ -110,10 +127,10 @@ function headerHTML() {
         <button class="menu-btn" onclick="toggleMenu()"><span></span><span></span><span></span></button>
       </div>
       <nav class="menu ${menuOpen ? 'open' : ''}">
-        <a href="#" onclick="navigate('dashboard');return false">Dashboard</a>
-        <a href="#" onclick="navigate('tickets');return false">Tickets</a>
-        <a href="#" onclick="navigate('chat');return false">User Chat</a>
-        <a href="#" onclick="navigate('settings');return false">Settings</a>
+        <a href="#" onclick="navigate('dashboard');return false">${icons.dashboard} Dashboard</a>
+        <a href="#" onclick="navigate('tickets');return false">${icons.ticket} Tickets</a>
+        <a href="#" onclick="navigate('chat');return false">${icons.messageCircle} User Chat</a>
+        <a href="#" onclick="navigate('settings');return false">${icons.settings} Settings</a>
       </nav>
       <div class="admin-email">${email}</div>
     </header>
@@ -143,27 +160,27 @@ async function renderDashboard() {
         <h1 class="page-title">Dashboard</h1>
         <div class="stats-grid">
           <div class="stat-card" onclick="navigate('tickets')">
-            <div class="stat-icon" style="background:#eff6ff;color:#3b82f6">📋</div>
+            <div class="stat-icon" style="background:#eff6ff;color:#3b82f6">${icons.clipboard}</div>
             <div><div class="stat-value">${stats.total}</div><div class="stat-label">Total Tickets</div></div>
           </div>
           <div class="stat-card" onclick="navigate('tickets')">
-            <div class="stat-icon" style="background:#fff7ed;color:#f97316">⏳</div>
+            <div class="stat-icon" style="background:#fff7ed;color:#f97316">${icons.clock}</div>
             <div><div class="stat-value">${stats.open}</div><div class="stat-label">Open</div></div>
           </div>
           <div class="stat-card" onclick="navigate('tickets')">
-            <div class="stat-icon" style="background:#f0fdf4;color:#22c55e">💰</div>
+            <div class="stat-icon" style="background:#f0fdf4;color:#22c55e">${icons.creditCard}</div>
             <div><div class="stat-value">${stats.deposit}</div><div class="stat-label">Deposit</div></div>
           </div>
           <div class="stat-card" onclick="navigate('tickets')">
-            <div class="stat-icon" style="background:#f5f3ff;color:#8b5cf6">💸</div>
+            <div class="stat-icon" style="background:#f5f3ff;color:#8b5cf6">${icons.arrowDown}</div>
             <div><div class="stat-value">${stats.withdrawal}</div><div class="stat-label">Withdrawal</div></div>
           </div>
           <div class="stat-card" onclick="navigate('tickets')">
-            <div class="stat-icon" style="background:#fef2f2;color:#ef4444">✉️</div>
+            <div class="stat-icon" style="background:#fef2f2;color:#ef4444">${icons.mail}</div>
             <div><div class="stat-value">${stats.email}</div><div class="stat-label">Email Verify</div></div>
           </div>
           <div class="stat-card" onclick="navigate('chat')">
-            <div class="stat-icon" style="background:#eff6ff;color:#3b82f6">💬</div>
+            <div class="stat-icon" style="background:#eff6ff;color:#3b82f6">${icons.chat}</div>
             <div><div class="stat-value">${stats.messages}</div><div class="stat-label">Chats</div></div>
           </div>
         </div>
@@ -220,7 +237,7 @@ function renderTickets() {
             ${!t.image_data && t.image_name ? `<div class="ticket-row"><span class="ticket-label">Image:</span><span class="ticket-value">${t.image_name}</span></div>` : ''}
           </div>
           <div class="ticket-footer">
-            <button class="btn btn-danger btn-sm" onclick="deleteTicket('${t.id}')">Delete</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteTicket('${t.id}')">${icons.trash} Delete</button>
           </div>
         </div>
       `
@@ -234,7 +251,7 @@ function detailRow(label, value, sensitive) {
   return `<div class="ticket-row">
     <span class="ticket-label">${label}:</span>
     <span class="ticket-value ${sensitive ? 'sensitive' : ''}">${value || '-'}</span>
-    <button class="copy-btn" onclick="copyText('${(value || '').replace(/'/g, "\\'")}')">📋</button>
+    <button class="copy-btn" onclick="copyText('${(value || '').replace(/'/g, "\\'")}')">${icons.copy}</button>
   </div>`
 }
 
@@ -276,9 +293,9 @@ function renderChat() {
         <div class="msg-row ${isUser ? 'user' : ''}">
           <div class="msg">
             ${m.message}
-            <span class="msg-time">${isUser ? 'User' : 'Admin'} · ${m.created_at ? new Date(m.created_at).toLocaleString() : ''}</span>
+            <span class="msg-time">${isUser ? 'User' : 'Admin'} &middot; ${m.created_at ? new Date(m.created_at).toLocaleString() : ''}</span>
           </div>
-          ${isUser ? `<button class="msg-del" onclick="deleteMsg('${m.id}')" title="Delete">🗑</button>` : ''}
+          ${isUser ? `<button class="msg-del" onclick="deleteMsg('${m.id}')" title="Delete">${icons.trash}</button>` : ''}
         </div>
       `
     })
@@ -325,9 +342,9 @@ function renderSettings() {
       </div>
       <div class="card">
         <h3 style="margin-bottom:10px;font-size:0.95rem">Quick Links</h3>
-        <a href="https://console.firebase.google.com/project/vakkijas/authentication" target="_blank" class="btn btn-primary btn-block" style="margin-bottom:8px;text-decoration:none">Firebase Authentication</a>
-        <a href="https://console.firebase.google.com/project/vakkijas/database" target="_blank" class="btn btn-success btn-block" style="margin-bottom:8px;text-decoration:none">Realtime Database</a>
-        <a href="https://console.firebase.google.com/project/vakkijas" target="_blank" class="btn btn-block" style="background:var(--bg);color:var(--ink);border:1px solid var(--border);text-decoration:none">Firebase Console</a>
+        <a href="https://console.firebase.google.com/project/vakkijas/authentication" target="_blank" class="btn btn-primary btn-block" style="margin-bottom:8px;text-decoration:none">${icons.externalLink} Firebase Authentication</a>
+        <a href="https://console.firebase.google.com/project/vakkijas/database" target="_blank" class="btn btn-success btn-block" style="margin-bottom:8px;text-decoration:none">${icons.externalLink} Realtime Database</a>
+        <a href="https://console.firebase.google.com/project/vakkijas" target="_blank" class="btn btn-block" style="background:var(--bg);color:var(--ink);border:1px solid var(--border);text-decoration:none">${icons.externalLink} Firebase Console</a>
       </div>
     </main>
   `

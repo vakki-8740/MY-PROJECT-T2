@@ -57,8 +57,10 @@ body {
 .menu a {
   color: var(--ink); text-decoration: none; padding: 13px 16px;
   border-top: 1px solid var(--border); font-weight: 500; font-size: 0.9rem;
+  display: flex; align-items: center; gap: 10px;
 }
 .menu a:active { background: var(--bg); }
+.menu a svg { flex-shrink: 0; }
 .admin-email { padding: 0 16px 8px; font-size: 0.7rem; color: var(--muted); }
 
 /* Page */
@@ -79,7 +81,7 @@ body {
 }
 .stat-icon {
   width: 40px; height: 40px; border-radius: 10px;
-  display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
 .stat-value { font-size: 1.4rem; font-weight: 700; }
 .stat-label { font-size: 0.72rem; color: var(--muted); }
@@ -107,6 +109,7 @@ body {
 }
 .btn:active { opacity: 0.8; }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn svg { flex-shrink: 0; }
 .btn-primary { background: var(--blue); color: #fff; }
 .btn-danger { background: var(--red); color: #fff; }
 .btn-success { background: var(--green); color: #fff; }
@@ -134,7 +137,7 @@ body {
 .copy-btn {
   background: var(--bg); border: 1px solid var(--border); color: var(--blue);
   width: 28px; height: 28px; border-radius: 8px; cursor: pointer;
-  font-size: 0.85rem; display: flex; align-items: center; justify-content: center;
+  display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
 }
 .copy-btn:active { background: var(--blue); color: #fff; }
@@ -155,7 +158,7 @@ body {
 .msg-row.user .msg { background: var(--blue); color: #fff; border-color: var(--blue); border-radius: 14px 14px 4px 14px; }
 .msg-time { display: block; font-size: 0.65rem; color: var(--muted); margin-top: 4px; }
 .msg-row.user .msg-time { color: rgba(255,255,255,0.7); }
-.msg-del { background: none; border: none; font-size: 0.9rem; cursor: pointer; opacity: 0.5; padding: 4px; }
+.msg-del { background: none; border: none; cursor: pointer; opacity: 0.5; padding: 4px; display: flex; align-items: center; }
 .msg-del:active { opacity: 1; }
 .chat-input { display: flex; gap: 8px; padding: 10px 0; }
 .chat-input input {
