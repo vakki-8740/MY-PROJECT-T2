@@ -1,15 +1,12 @@
-import { db } from '../firebase.js'
+import { db } from './firebase.js'
 import { ref, onValue, update, remove } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js'
-import { appEl } from '../state.js'
-import { icons } from '../icons.js'
 import { headerHTML } from './header.js'
+import { icons } from './icons.js'
+import { copyText } from './utils.js'
 
+const appEl = document.getElementById('app')
 let imageDataCache = {}
 let unsubTickets = null
-
-function cacheImageData(id, data) {
-  imageDataCache[id] = data
-}
 
 function detailRow(label, value, sensitive) {
   return `<div class="ticket-row">
@@ -52,13 +49,10 @@ window.deleteTicket = (id) => {
   }
 }
 
-window.copyText = (text) => {
-  navigator.clipboard?.writeText(text)
-  window.showToast('Copied!')
-}
+window.copyText = copyText
 
-export function renderTickets() {
-  appEl.innerHTML = headerHTML() + `<main class="page"><p class="empty">Loading tickets...</p></main>`
+function render() {
+  appEl.innerHTML = headerHTML('tickets') + `<main class="page"><p class="empty">Loading tickets...</p></main>`
   if (unsubTickets) unsubTickets()
 
   unsubTickets = onValue(ref(db, 'tickets'), (snap) => {
@@ -67,7 +61,7 @@ export function renderTickets() {
       .map(([id, t]) => ({ id, ...t }))
       .sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''))
 
-    let html = headerHTML() + `
+    let html = headerHTML('tickets') + `
       <main class="page">
         <h1 class="page-title">All Tickets (${list.length})</h1>
     `
@@ -78,7 +72,7 @@ export function renderTickets() {
       const typeColor = t.type === 'deposit' ? '#eff6ff,#3b82f6' : t.type === 'withdrawal' ? '#f0fdf4,#22c55e' : '#f5f3ff,#8b5cf6'
       const [bg, fg] = typeColor.split(',')
       const typeLabel = t.type === 'deposit' ? 'Deposit' : t.type === 'withdrawal' ? 'Withdrawal' : 'Email'
-      if (t.image_data) cacheImageData(t.id, t.image_data)
+      if (t.image_data) imageDataCache[t.id] = t.image_data
       html += `
         <div class="ticket-card">
           <div class="ticket-header">
@@ -112,3 +106,5 @@ export function renderTickets() {
     appEl.innerHTML = html
   })
 }
+
+render()

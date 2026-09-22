@@ -1,9 +1,10 @@
-import { appEl } from '../state.js'
-import { icons } from '../icons.js'
 import { headerHTML } from './header.js'
+import { icons } from './icons.js'
 
-export function renderSettings() {
-  appEl.innerHTML = headerHTML() + `
+const appEl = document.getElementById('app')
+
+function render() {
+  appEl.innerHTML = headerHTML('settings') + `
     <main class="page">
       <h1 class="page-title">Settings</h1>
       <div class="card">
@@ -20,3 +21,5 @@ export function renderSettings() {
     </main>
   `
 }
+
+render()

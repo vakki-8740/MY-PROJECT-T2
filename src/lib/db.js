@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app'
-import { getDatabase, ref, push, set, update, remove, onValue, get, serverTimestamp } from 'firebase/database'
+import { getDatabase, ref, push, set, update, remove, onValue, get, serverTimestamp, onDisconnect } from 'firebase/database'
 
 const firebaseConfig = {
   apiKey: 'AIzaSyDQ_76DHQJ5hDZ1SaWsuz-jvZ6vhZ7grns',
@@ -14,7 +14,36 @@ const firebaseConfig = {
 
 export const app = initializeApp(firebaseConfig)
 export const db = getDatabase(app)
-export { ref, push, set, update, remove, onValue, get, serverTimestamp }
+export { ref, push, set, update, remove, onValue, get, serverTimestamp, onDisconnect }
+
+// ---- User Presence (Online/Offline) ----
+function getUserId() {
+  let id = localStorage.getItem('lucky_user_id')
+  if (!id) {
+    id = 'user_' + Math.random().toString(36).slice(2, 10)
+    localStorage.setItem('lucky_user_id', id)
+  }
+  return id
+}
+
+export function trackPresence() {
+  const uid = getUserId()
+  const userRef = ref(db, `users/${uid}`)
+  const connectedRef = ref(db, '.info/connected')
+
+  onValue(connectedRef, (snap) => {
+    if (snap.val() === true) {
+      update(userRef, { online: true })
+      onDisconnect(userRef).update({ online: false })
+    }
+  })
+
+  return uid
+}
+
+export function getUserIdForChat() {
+  return getUserId()
+}
 
 // ---- Tickets ----
 export function createTicket(type, fields) {
@@ -67,10 +96,12 @@ export function deleteTicket(id) {
 }
 
 // ---- Chat ----
-export function sendChatMessage(sender, message) {
+export function sendChatMessage(sender, message, type = 'text', userId = '') {
   return push(ref(db, 'chat_messages'), {
     sender,
+    userId,
     message,
+    type,
     edited: false,
     created_at: new Date().toISOString(),
   })

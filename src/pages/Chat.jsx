@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { sendChatMessage, editChatMessage, deleteChatMessage, subscribeChat } from '../lib/db.js'
+import { sendChatMessage, editChatMessage, deleteChatMessage, subscribeChat, trackPresence, getUserIdForChat } from '../lib/db.js'
 
 const fmt = (iso) => {
   const d = iso ? new Date(iso) : new Date()
@@ -12,6 +12,11 @@ export default function Chat() {
   const [popup, setPopup] = useState(null)
   const [menuFor, setMenuFor] = useState(null)
   const endRef = useRef(null)
+  const userIdRef = useRef(null)
+
+  useEffect(() => {
+    userIdRef.current = trackPresence()
+  }, [])
 
   useEffect(() => {
     const unsub = subscribeChat(setMessages)
@@ -25,7 +30,18 @@ export default function Chat() {
     const text = input.trim()
     if (!text) return
     setInput('')
-    sendChatMessage('user', text).catch(() => {})
+    sendChatMessage('user', text, 'text', userIdRef.current).catch(() => {})
+  }
+
+  const sendImage = (e) => {
+    const file = e.target.files[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = () => {
+      sendChatMessage('user', reader.result, 'image', userIdRef.current).catch(() => {})
+    }
+    reader.readAsDataURL(file)
+    e.target.value = ''
   }
 
   const openMenu = (msg) => {
@@ -64,13 +80,18 @@ export default function Chat() {
         {messages.map((m) => ({
           id: m.id,
           text: m.message,
+          type: m.type || 'text',
           mine: m.sender === 'user',
           time: fmt(m.created_at),
           edited: !!m.edited,
         })).map((m) => (
           <div key={m.id} className={`msg-row ${m.mine ? 'mine' : ''}`}>
             <div className="msg" onClick={() => setPopup(m)}>
-              {m.text}
+              {m.type === 'image' ? (
+                <img src={m.text} alt="shared" className="chat-image" />
+              ) : (
+                m.text
+              )}
               {m.edited && <span className="edited"> (edited)</span>}
               <span className="msg-time">{m.time}</span>
             </div>
@@ -92,6 +113,10 @@ export default function Chat() {
         <div ref={endRef} />
       </div>
       <form className="chat-input" onSubmit={send}>
+        <label className="img-upload-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <input type="file" accept="image/*" onChange={sendImage} hidden />
+        </label>
         <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="Type your message..." />
         <button type="submit" className="btn send-btn">Send</button>
       </form>
@@ -100,7 +125,11 @@ export default function Chat() {
         <div className="popup-overlay" onClick={() => setPopup(null)}>
           <div className="popup" onClick={(e) => e.stopPropagation()}>
             <h3>Message Details</h3>
-            <p><strong>Message:</strong> {popup.text}</p>
+            {popup.type === 'image' ? (
+              <img src={popup.text} alt="shared" style={{ maxWidth: '100%', borderRadius: 8 }} />
+            ) : (
+              <p><strong>Message:</strong> {popup.text}</p>
+            )}
             <p><strong>From:</strong> {popup.mine ? 'You' : 'Support'}</p>
             <p><strong>Date + Time:</strong> {popup.time}</p>
             <button className="btn" onClick={() => setPopup(null)}>Close</button>

@@ -239,7 +239,7 @@ body {
 .msg-menu button:hover { background: rgba(0, 0, 0, 0.05); }
 .msg-menu .danger { color: var(--red); }
 
-.chat-input { display: flex; gap: 8px; padding: 10px 0 16px; }
+.chat-input { display: flex; gap: 8px; padding: 10px 0 16px; align-items: center; }
 .chat-input input {
   flex: 1; padding: 13px 16px; border-radius: 20px; border: 1.5px solid var(--border);
   font-size: 1rem; background: #fff; font-family: inherit;
@@ -247,6 +247,13 @@ body {
 }
 .chat-input input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.12); }
 .send-btn { padding: 12px 22px; border-radius: 20px; }
+.img-upload-btn {
+  width: 42px; height: 42px; border-radius: 50%; background: var(--blue-soft);
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+  color: var(--blue); flex-shrink: 0; transition: background 0.15s;
+}
+.img-upload-btn:active { background: var(--blue); color: #fff; }
+.chat-image { max-width: 200px; border-radius: 12px; display: block; }
 
 .popup-overlay {
   position: fixed; inset: 0; background: rgba(0, 0, 0, 0.4);
