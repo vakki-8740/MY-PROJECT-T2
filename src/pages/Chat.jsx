@@ -172,16 +172,19 @@ export default function Chat() {
 
       {popup && (
         <div className="popup-overlay" onClick={() => setPopup(null)}>
-          <div className="popup" onClick={(e) => e.stopPropagation()}>
-            <h3>Message Details</h3>
+          <div className="popup img-preview-popup" onClick={(e) => e.stopPropagation()}>
+            <button className="img-preview-close" onClick={() => setPopup(null)}>&times;</button>
             {popup.type === 'image' ? (
-              <img src={popup.text} alt="shared" style={{ maxWidth: '100%', borderRadius: 8 }} />
+              <img src={popup.text} alt="shared" className="img-preview" />
             ) : (
-              <p><strong>Message:</strong> {popup.text}</p>
+              <div className="img-preview-text">
+                <p><strong>Message:</strong> {popup.text}</p>
+              </div>
             )}
-            <p><strong>From:</strong> {popup.mine ? 'You' : 'Support'}</p>
-            <p><strong>Date + Time:</strong> {popup.time}</p>
-            <button className="btn" onClick={() => setPopup(null)}>Close</button>
+            <div className="img-preview-info">
+              <span>{popup.mine ? 'You' : 'Support'}</span>
+              <span>{popup.time}</span>
+            </div>
           </div>
         </div>
       )}
