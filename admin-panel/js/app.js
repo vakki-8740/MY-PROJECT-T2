@@ -213,6 +213,7 @@ function renderTickets() {
       const typeColor = t.type === 'deposit' ? '#eff6ff,#3b82f6' : t.type === 'withdrawal' ? '#f0fdf4,#22c55e' : '#f5f3ff,#8b5cf6'
       const [bg, fg] = typeColor.split(',')
       const typeLabel = t.type === 'deposit' ? 'Deposit' : t.type === 'withdrawal' ? 'Withdrawal' : 'Email'
+      if (t.image_data) cacheImageData(t.id, t.image_data)
       html += `
         <div class="ticket-card">
           <div class="ticket-header">
@@ -233,7 +234,7 @@ function renderTickets() {
             ${t.problem ? `<div class="ticket-row"><span class="ticket-label">Problem:</span><span class="ticket-value">${t.problem}</span></div>` : ''}
             ${t.amount ? `<div class="ticket-row"><span class="ticket-label">Amount:</span><span class="ticket-value">${t.amount}</span></div>` : ''}
             <div class="ticket-row"><span class="ticket-label">Submitted:</span><span class="ticket-value">${t.created_at ? new Date(t.created_at).toLocaleString() : '-'}</span></div>
-            ${t.image_data ? `<div class="ticket-img"><img src="${t.image_data}" alt="upload"></div>` : ''}
+            ${t.image_data ? `<div class="ticket-row"><span class="ticket-label">Image:</span><button class="btn btn-primary btn-sm" onclick="showImage('${t.id}')">View</button></div>` : ''}
             ${!t.image_data && t.image_name ? `<div class="ticket-row"><span class="ticket-label">Image:</span><span class="ticket-value">${t.image_name}</span></div>` : ''}
           </div>
           <div class="ticket-footer">
@@ -266,6 +267,36 @@ window.deleteTicket = (id) => {
 window.copyText = (text) => {
   navigator.clipboard?.writeText(text)
   showToast('Copied!')
+}
+
+// ---- Image Modal ----
+let imageDataCache = {}
+
+function cacheImageData(id, data) {
+  imageDataCache[id] = data
+}
+
+window.showImage = (id) => {
+  const data = imageDataCache[id]
+  if (!data) return
+  const modal = document.createElement('div')
+  modal.className = 'modal-overlay'
+  modal.innerHTML = `
+    <div class="modal-content">
+      <div class="modal-header">
+        <span class="modal-title">Image Preview</span>
+        <button class="modal-close" onclick="closeImage()">&times;</button>
+      </div>
+      <img src="${data}" alt="ticket image" class="modal-img">
+    </div>
+  `
+  modal.addEventListener('click', (e) => { if (e.target === modal) closeImage() })
+  document.body.appendChild(modal)
+}
+
+window.closeImage = () => {
+  const modal = document.querySelector('.modal-overlay')
+  if (modal) modal.remove()
 }
 
 // ---- Chat ----
